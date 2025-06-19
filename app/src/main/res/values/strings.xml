@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">ChemStart</string>
+    <string name="level_1_title">First 20 Elements</string>
+    <string name="level_2_title">Alkali Metals</string>
+    <string name="level_3_title">Transition Metals</string>
+    <string name="level_4_title">Halogens</string>
+    <string name="level_5_title">Full Periodic Table</string>
+    <string name="unknown_level">Unknown Level</string>
 </resources>
