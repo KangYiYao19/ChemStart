@@ -72,7 +72,7 @@ class DragDropActivity : AppCompatActivity() {
 
         val tile = TextView(this).apply {
             text = currentElement!!.symbol
-            textSize = 24f
+            textSize = 16f
             setTextColor(Color.WHITE)
             setBackgroundColor(getColorForElement(currentElement!!))
             gravity = Gravity.CENTER
