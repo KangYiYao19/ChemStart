@@ -27,18 +27,24 @@ class MainActivity : AppCompatActivity() {
             Pair(binding.btnLevel5Drag, binding.btnLevel5Quiz)
         )
 
+        val prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE)
+
         for (i in buttons.indices) {
             val level = i + 1
             val (dragBtn, quizBtn) = buttons[i]
-            val unlocked = if (level == 1) true else isLevelCompleted(level - 1)
+
+            val dragPassed = prefs.getBoolean("dragdrop_level_$level", false)
+            val quizPassed = prefs.getBoolean("quiz_level_$level", false)
+
+            // Enable only if it's level 1 or previous level is fully completed
+            val unlocked = level == 1 || (prefs.getBoolean("dragdrop_level_${level - 1}", false)
+                    && prefs.getBoolean("quiz_level_${level - 1}", false))
 
             dragBtn.isEnabled = unlocked
             quizBtn.isEnabled = unlocked
 
-            if (isLevelCompleted(level)) {
-                dragBtn.text = "✅ Drag & Drop"
-                quizBtn.text = "✅ Quiz"
-            }
+            dragBtn.text = if (dragPassed) "✅ Drag & Drop" else "Drag & Drop"
+            quizBtn.text = if (quizPassed) "✅ Quiz" else "Quiz"
 
             dragBtn.setOnClickListener {
                 startDragDropActivity(level)
