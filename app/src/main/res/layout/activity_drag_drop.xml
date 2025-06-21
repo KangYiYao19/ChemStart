@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/white"
+    android:background="@color/soft_white"
     android:padding="8dp"
     tools:context=".DragDropActivity">
 
@@ -38,6 +38,7 @@
                 android:text="0"
                 android:textSize="18sp"
                 android:textStyle="bold"
+                android:textColor="@color/black"
                 android:layout_marginStart="4dp"
                 android:layout_marginEnd="16dp" />
 
@@ -52,6 +53,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="0"
+                android:textColor="@color/black"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:layout_marginStart="4dp" />
@@ -135,22 +137,29 @@
 <!--    </LinearLayout>-->
 
     <!-- Periodic Table Grid -->
-    <ScrollView
+    <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:fillViewport="true">
 
-        <GridLayout
-            android:id="@+id/periodicTableGrid"
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:columnCount="18"
-            android:rowCount="10"
-            android:padding="4dp"
-            android:clipChildren="false"
-            android:clipToPadding="false"
-            android:orientation="horizontal" />
-    </ScrollView>
+            android:gravity="center">
+
+            <GridLayout
+                android:id="@+id/periodicTableGrid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:columnCount="18"
+                android:rowCount="10"
+                android:padding="4dp"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:orientation="horizontal"
+                android:layout_gravity="center" />
+        </FrameLayout>
+    </HorizontalScrollView>
 
 </LinearLayout>
