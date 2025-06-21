@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.DialogInterface
 import android.content.res.Resources
 import android.graphics.Color
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.DragEvent
@@ -170,9 +171,12 @@ class DragDropActivity : AppCompatActivity() {
                             targetCell.setBackgroundColor(getColorForElement(draggedElement))
                             correctPlacements++
                             binding.tvCorrectScore.text = correctPlacements.toString()
+
+                            playSuccessSound()
                         } else {
                             incorrectPlacements++
                             binding.tvIncorrectScore.text = incorrectPlacements.toString()
+                            playWrongSound()
                         }
 
                         createNextElementTile()
@@ -278,4 +282,20 @@ class DragDropActivity : AppCompatActivity() {
 
     private fun dpToPx(dp: Int): Int =
         (dp * Resources.getSystem().displayMetrics.density).toInt()
+
+    private fun playSuccessSound() {
+        val mediaPlayer = MediaPlayer.create(this, R.raw.success)
+        mediaPlayer.start()
+        mediaPlayer.setOnCompletionListener {
+            it.release() // Free up resources after playing
+        }
+    }
+
+    private fun playWrongSound() {
+        val mediaPlayer = MediaPlayer.create(this, R.raw.wrong)
+        mediaPlayer.start()
+        mediaPlayer.setOnCompletionListener {
+            it.release() // Free up resources after playing
+        }
+    }
 }

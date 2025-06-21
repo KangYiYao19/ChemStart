@@ -20,9 +20,18 @@
             android:textColor="@color/dark_text"
             android:textSize="28sp"
             android:textStyle="bold"
-            android:layout_marginBottom="24dp"
             android:layout_gravity="center_horizontal"
             android:fontFamily="sans-serif-medium" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Kang Yi Yao 22004814"
+            android:textAlignment="center"
+            android:textSize="12dp"
+            android:textColor="@color/black"
+            android:layout_marginBottom="24dp"
+            />
 
         <ImageView
             android:id="@+id/imgLogo"
@@ -31,6 +40,16 @@
             android:src="@drawable/scientist"
             android:contentDescription="ChemStart Logo"
             android:layout_gravity="center_horizontal" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Score at least 70% in each activity to mark it as completed."
+            android:textAlignment="center"
+            android:textSize="12dp"
+            android:layout_marginBottom="16dp"
+            android:textColor="@color/black"
+            />
 
         <!-- Level Cards -->
         <!-- Repeated card block for each level -->

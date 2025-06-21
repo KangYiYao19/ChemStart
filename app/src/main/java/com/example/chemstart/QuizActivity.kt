@@ -1,6 +1,7 @@
 package com.example.chemstart
 
 import android.content.Intent
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.widget.RadioButton
 import android.widget.Toast
@@ -87,9 +88,11 @@ class QuizActivity : AppCompatActivity() {
 
         val selectedRadioButton = findViewById<RadioButton>(selectedId)
         if (selectedRadioButton.text == currentElement.symbol) {
+            playSuccessSound()
             score++
             Toast.makeText(this, "Correct!", Toast.LENGTH_SHORT).show()
         } else {
+            playWrongSound()
             Toast.makeText(this, "Wrong! It's ${currentElement.symbol}", Toast.LENGTH_SHORT).show()
         }
 
@@ -115,5 +118,21 @@ class QuizActivity : AppCompatActivity() {
             .edit()
             .putBoolean("quiz_level_$level", true)
             .apply()
+    }
+
+    private fun playSuccessSound() {
+        val mediaPlayer = MediaPlayer.create(this, R.raw.success)
+        mediaPlayer.start()
+        mediaPlayer.setOnCompletionListener {
+            it.release() // Free up resources after playing
+        }
+    }
+
+    private fun playWrongSound() {
+        val mediaPlayer = MediaPlayer.create(this, R.raw.wrong)
+        mediaPlayer.start()
+        mediaPlayer.setOnCompletionListener {
+            it.release() // Free up resources after playing
+        }
     }
 }
