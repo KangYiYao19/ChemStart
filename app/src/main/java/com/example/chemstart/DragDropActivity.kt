@@ -95,77 +95,53 @@ class DragDropActivity : AppCompatActivity() {
         binding.draggableElementContainer.addView(tile)
     }
 
-    private fun renderPeriodicTable(elements: List<ElementDatabase.Element>) {
+    private fun renderPeriodicTable(levelElements: List<ElementDatabase.Element>) {
         val grid = binding.periodicTableGrid
         grid.removeAllViews()
-        val elementMap = elements.associateBy { Pair(it.period, it.group) }
 
-        for (period in 1..7) {
-            for (group in 1..18) {
-                val key = Pair(period, group)
-                val element = elementMap[key]
+        val allElements = ElementDatabase.allElements
+        val testedSet = levelElements.map { Pair(it.period, it.group) }.toSet()
+        val elementMap = allElements.associateBy { Pair(it.period, it.group) }
 
-                if (element == null && !(period == 6 && group in 3..17) && !(period == 7 && group in 3..17)) {
-                    continue
+        // Calculate max rows/cols dynamically from available elements
+        val maxPeriod = allElements.maxOf { it.period }
+        val maxGroup = allElements.maxOf { it.group }
+        grid.rowCount = maxPeriod
+        grid.columnCount = maxGroup
+
+        for ((key, element) in elementMap) {
+            val (period, group) = key
+            val isTested = testedSet.contains(key)
+
+            val cell = TextView(this).apply {
+                gravity = Gravity.CENTER
+
+                textSize = 14f
+                setPadding(2, 2, 2, 2)
+                setBackgroundResource(R.drawable.cell_border)
+
+                layoutParams = GridLayout.LayoutParams(
+                    GridLayout.spec(period - 1), GridLayout.spec(group - 1)
+                ).apply {
+                    width = dpToPx(40)
+                    height = dpToPx(40)
+                    setMargins(dpToPx(1), dpToPx(1), dpToPx(1), dpToPx(1))
                 }
 
-                val cell = TextView(this).apply {
-                    text = element?.symbol ?: ""
+                if (isTested) {
+                    text = ""
                     tag = element
-                    gravity = Gravity.CENTER
-                    textSize = 14f
-                    setPadding(2, 2, 2, 2)
+                    isEnabled = true
+                    setTextColor(Color.DKGRAY)
+                    setBackgroundColor(Color.WHITE)
                     setBackgroundResource(R.drawable.cell_border)
-
-                    layoutParams = GridLayout.LayoutParams(
-                        GridLayout.spec(period - 1), GridLayout.spec(group - 1)
-                    ).apply {
-                        width = dpToPx(40)
-                        height = dpToPx(40)
-                        setMargins(dpToPx(1), dpToPx(1), dpToPx(1), dpToPx(1))
-                    }
-                }
-
-                grid.addView(cell)
-            }
-        }
-        for ((index, lanthanide) in elements.filter { it.period == 8 }.withIndex()) {
-            val cell = TextView(this).apply {
-                text = lanthanide.symbol
-                tag = lanthanide
-                gravity = Gravity.CENTER
-                textSize = 14f
-                setPadding(2, 2, 2, 2)
-                setBackgroundResource(R.drawable.cell_border)
-
-                layoutParams = GridLayout.LayoutParams(
-                    GridLayout.spec(7), GridLayout.spec(index + 2) // Period 8 at row 7 (0-based)
-                ).apply {
-                    width = dpToPx(40)
-                    height = dpToPx(40)
-                    setMargins(dpToPx(1), dpToPx(1), dpToPx(1), dpToPx(1))
-                }
-            }
-
-            grid.addView(cell)
-        }
-
-        // Add Actinides (Period 9)
-        for ((index, actinide) in elements.filter { it.period == 9 }.withIndex()) {
-            val cell = TextView(this).apply {
-                text = actinide.symbol
-                tag = actinide
-                gravity = Gravity.CENTER
-                textSize = 14f
-                setPadding(2, 2, 2, 2)
-                setBackgroundResource(R.drawable.cell_border)
-
-                layoutParams = GridLayout.LayoutParams(
-                    GridLayout.spec(8), GridLayout.spec(index + 2) // Period 9 at row 8 (0-based)
-                ).apply {
-                    width = dpToPx(40)
-                    height = dpToPx(40)
-                    setMargins(dpToPx(1), dpToPx(1), dpToPx(1), dpToPx(1))
+                } else {
+                    text = element.symbol
+                    isEnabled = false
+                    tag = null
+                    setTextColor(Color.BLACK)
+                    setBackgroundColor(Color.LTGRAY)
+                    setBackgroundResource(R.drawable.cell_border)
                 }
             }
 
@@ -173,9 +149,15 @@ class DragDropActivity : AppCompatActivity() {
         }
     }
 
+
+
     private fun setupGridDropTargets() {
         for (i in 0 until binding.periodicTableGrid.childCount) {
             val cell = binding.periodicTableGrid.getChildAt(i) as TextView
+
+            val targetElement = cell.tag as? ElementDatabase.Element
+            if (targetElement == null) continue
+
             cell.setOnDragListener { view, event ->
                 when (event.action) {
                     DragEvent.ACTION_DROP -> {

@@ -260,7 +260,7 @@ android:background="@color/white">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Level 5: Full Periodic Table (All 118)"
+                android:text="Level 5: Full Periodic Table"
                 android:textSize="18sp"
                 android:textStyle="bold"/>
 
