@@ -66,8 +66,8 @@
 
             <FrameLayout
                 android:id="@+id/draggableElementContainer"
-                android:layout_width="120dp"
-                android:layout_height="80dp"
+                android:layout_width="80dp"
+                android:layout_height="60dp"
                 android:background="@drawable/element_tile_background"
                 android:elevation="4dp">
 
@@ -83,7 +83,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Pu"
-                        android:textSize="24sp"
+                        android:textSize="16sp"
                         android:textStyle="bold"
                         android:textColor="@color/black" />
 
@@ -110,29 +110,29 @@
             android:padding="8dp" />
     </LinearLayout>
 
-    <!-- Action Buttons -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_marginBottom="8dp">
+<!--    &lt;!&ndash; Action Buttons &ndash;&gt;-->
+<!--    <LinearLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:orientation="horizontal"-->
+<!--        android:gravity="center"-->
+<!--        android:layout_marginBottom="8dp">-->
 
-        <Button
-            android:id="@+id/btnCheck"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Check"
-            android:backgroundTint="@color/purple_500"
-            android:layout_marginEnd="8dp" />
+<!--        <Button-->
+<!--            android:id="@+id/btnCheck"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Check"-->
+<!--            android:backgroundTint="@color/purple_500"-->
+<!--            android:layout_marginEnd="8dp" />-->
 
-        <Button
-            android:id="@+id/btnReset"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Reset"
-            android:backgroundTint="@color/grey_500" />
-    </LinearLayout>
+<!--        <Button-->
+<!--            android:id="@+id/btnReset"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Reset"-->
+<!--            android:backgroundTint="@color/grey_500" />-->
+<!--    </LinearLayout>-->
 
     <!-- Periodic Table Grid -->
     <ScrollView

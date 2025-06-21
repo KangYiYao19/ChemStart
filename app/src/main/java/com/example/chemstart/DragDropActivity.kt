@@ -39,9 +39,9 @@ class DragDropActivity : AppCompatActivity() {
 
         setupGame(level)
         startTimer(level)
-
-        binding.btnCheck.setOnClickListener { checkAnswers() }
-        binding.btnReset.setOnClickListener { resetGame() }
+//
+//        binding.btnCheck.setOnClickListener { checkAnswers() }
+//        binding.btnReset.setOnClickListener { resetGame() }
     }
 
     @SuppressLint("SetTextI18n")
@@ -105,8 +105,12 @@ class DragDropActivity : AppCompatActivity() {
                 val key = Pair(period, group)
                 val element = elementMap[key]
 
+                if (element == null && !(period == 6 && group in 3..17) && !(period == 7 && group in 3..17)) {
+                    continue
+                }
+
                 val cell = TextView(this).apply {
-                    text = ""
+                    text = element?.symbol ?: ""
                     tag = element
                     gravity = Gravity.CENTER
                     textSize = 14f
@@ -124,6 +128,48 @@ class DragDropActivity : AppCompatActivity() {
 
                 grid.addView(cell)
             }
+        }
+        for ((index, lanthanide) in elements.filter { it.period == 8 }.withIndex()) {
+            val cell = TextView(this).apply {
+                text = lanthanide.symbol
+                tag = lanthanide
+                gravity = Gravity.CENTER
+                textSize = 14f
+                setPadding(2, 2, 2, 2)
+                setBackgroundResource(R.drawable.cell_border)
+
+                layoutParams = GridLayout.LayoutParams(
+                    GridLayout.spec(7), GridLayout.spec(index + 2) // Period 8 at row 7 (0-based)
+                ).apply {
+                    width = dpToPx(40)
+                    height = dpToPx(40)
+                    setMargins(dpToPx(1), dpToPx(1), dpToPx(1), dpToPx(1))
+                }
+            }
+
+            grid.addView(cell)
+        }
+
+        // Add Actinides (Period 9)
+        for ((index, actinide) in elements.filter { it.period == 9 }.withIndex()) {
+            val cell = TextView(this).apply {
+                text = actinide.symbol
+                tag = actinide
+                gravity = Gravity.CENTER
+                textSize = 14f
+                setPadding(2, 2, 2, 2)
+                setBackgroundResource(R.drawable.cell_border)
+
+                layoutParams = GridLayout.LayoutParams(
+                    GridLayout.spec(8), GridLayout.spec(index + 2) // Period 9 at row 8 (0-based)
+                ).apply {
+                    width = dpToPx(40)
+                    height = dpToPx(40)
+                    setMargins(dpToPx(1), dpToPx(1), dpToPx(1), dpToPx(1))
+                }
+            }
+
+            grid.addView(cell)
         }
     }
 
@@ -165,15 +211,16 @@ class DragDropActivity : AppCompatActivity() {
     }
 
     private fun checkAnswers() {
-        if (correctPlacements == totalElements) {
-            showResultDialog(true)
-        } else {
-            AlertDialog.Builder(this)
-                .setTitle("Incomplete")
-                .setMessage("You've placed $correctPlacements out of $totalElements elements correctly")
-                .setPositiveButton("OK", null)
-                .show()
-        }
+        countDownTimer.cancel()
+
+        AlertDialog.Builder(this)
+            .setTitle("Game Over")
+            .setMessage("Correct: $correctPlacements\nIncorrect: $incorrectPlacements")
+            .setCancelable(false)
+            .setPositiveButton("OK") { _, _ ->
+                finish() // End activity and return to MainActivity
+            }
+            .show()
     }
 
     private fun resetGame() {
