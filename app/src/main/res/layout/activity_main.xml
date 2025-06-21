@@ -17,7 +17,7 @@ android:background="@color/white">
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Periodic Table Master"
+        android:text="ChemStart"
         android:textColor="@color/black"
         android:textSize="24sp"
         android:textStyle="bold"
