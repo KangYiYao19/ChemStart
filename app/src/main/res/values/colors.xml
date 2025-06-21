@@ -15,4 +15,11 @@
     <color name="timer_default">#000000</color>
     <color name="drag_target_highlight">#3300FF00</color>
     <color name="green_500">#4CAF50</color>
+    <color name="beige">#FFF9E5</color>
+    <color name="sunny_yellow">#FFD54F</color>
+    <color name="amber">#FFB300</color>
+    <color name="golden_brown">#8D6E63</color>
+    <color name="bright_orange">#FFA000</color>
+    <color name="dark_text">#4E342E</color>
+    <color name="soft_white">#FFFDE7</color>
 </resources>
