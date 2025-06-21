@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    android:background="@color/white">
+    android:background="@color/soft_white">
 
     <!-- Header Section -->
     <LinearLayout
@@ -33,38 +33,39 @@
             android:textSize="16sp"/>
     </LinearLayout>
 
+    <ImageView
+        android:id="@+id/imgQuestion"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:src="@drawable/question"
+        android:contentDescription="Question illustration"
+        android:layout_gravity="center_horizontal" />
+
     <!-- Question Card -->
-    <androidx.cardview.widget.CardView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="4dp">
+        android:orientation="vertical"
+        android:background="@color/soft_white">
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/tvQuestion"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:text="What is the symbol for Oxygen?"
+            android:textColor="@color/black"
+            android:textSize="24sp"
+            android:layout_marginBottom="16dp"/>
 
-            <TextView
-                android:id="@+id/tvQuestion"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="What is the symbol for Oxygen?"
-                android:textSize="18sp"
-                android:layout_marginBottom="16dp"/>
-
-            <ImageView
-                android:id="@+id/ivElement"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_gravity="center_horizontal"
-                android:visibility="gone"
-                android:contentDescription="Element visual"
-                android:layout_marginBottom="16dp"/>
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
+        <ImageView
+            android:id="@+id/ivElement"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center_horizontal"
+            android:visibility="gone"
+            android:contentDescription="Element visual"
+            android:layout_marginBottom="16dp"/>
+    </LinearLayout>
 
     <!-- Answer Options -->
     <RadioGroup
@@ -77,21 +78,25 @@
         <RadioButton
             android:id="@+id/rbOption1"
             style="@style/QuizOptionButton"
+            android:textColor="@color/black"
             android:text="O"/>
 
         <RadioButton
             android:id="@+id/rbOption2"
             style="@style/QuizOptionButton"
+            android:textColor="@color/black"
             android:text="Ox"/>
 
         <RadioButton
             android:id="@+id/rbOption3"
             style="@style/QuizOptionButton"
+            android:textColor="@color/black"
             android:text="Og"/>
 
         <RadioButton
             android:id="@+id/rbOption4"
             style="@style/QuizOptionButton"
+            android:textColor="@color/black"
             android:text="On"/>
     </RadioGroup>
 
@@ -113,9 +118,10 @@
 
         <Button
             android:id="@+id/btnNext"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Next"
+            android:backgroundTint="@color/bright_orange"
             style="@style/QuizActionButton"/>
     </LinearLayout>
 

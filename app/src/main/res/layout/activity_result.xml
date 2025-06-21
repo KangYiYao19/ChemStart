@@ -20,10 +20,10 @@
 
     <ImageView
         android:id="@+id/ivResult"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
         android:layout_marginBottom="24dp"
-        android:src="@drawable/ic_quiz_result"/>
+        android:src="@drawable/victory"/>
 
     <TextView
         android:id="@+id/tvScore"
@@ -31,6 +31,7 @@
         android:layout_height="wrap_content"
         android:textSize="36sp"
         android:textStyle="bold"
+        android:textColor="@color/black"
         android:layout_marginBottom="8dp"/>
 
     <TextView
@@ -53,6 +54,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="18sp"
+        android:textColor="@color/black"
         android:gravity="center"
         android:layout_marginBottom="32dp"/>
 
@@ -61,13 +63,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Try Again"
-        android:layout_marginBottom="16dp"
-        style="@style/Widget.AppCompat.Button.Colored"/>
+        android:layout_marginBottom="16dp"/>
 
     <Button
         android:id="@+id/btnMenu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Back to Menu"
-        style="@style/Widget.AppCompat.Button.Borderless"/>
+        android:textColor="@color/black"
+        android:elevation="0dp"
+        android:backgroundTint="@color/beige"/>
 </LinearLayout>
