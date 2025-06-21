@@ -97,11 +97,23 @@ class QuizActivity : AppCompatActivity() {
     }
 
     private fun showResult() {
+        val accuracy = score.toDouble() / totalQuestions
+        if (accuracy >= 0.7) {
+            saveQuizCompleted(intent.getIntExtra("LEVEL", 1))
+        }
+
         val intent = Intent(this, ResultActivity::class.java).apply {
             putExtra("SCORE", score)
             putExtra("TOTAL", totalQuestions)
         }
         startActivity(intent)
         finish()
+    }
+
+    private fun saveQuizCompleted(level: Int) {
+        getSharedPreferences("ChemStartPrefs", MODE_PRIVATE)
+            .edit()
+            .putBoolean("quiz_level_$level", true)
+            .apply()
     }
 }

@@ -201,14 +201,20 @@ class DragDropActivity : AppCompatActivity() {
                 finish() // End activity and return to MainActivity
             }
             .show()
+
+        saveDragDropIfPassed()
     }
 
-    private fun resetGame() {
-        correctPlacements = 0
-        incorrectPlacements = 0
-        setupGame(intent.getIntExtra("LEVEL", 1))
+    private fun saveDragDropIfPassed() {
+        val level = intent.getIntExtra("LEVEL", 1)
+        val accuracy = correctPlacements.toDouble() / totalElements
+        if (accuracy >= 0.7) {
+            getSharedPreferences("ChemStartPrefs", MODE_PRIVATE)
+                .edit()
+                .putBoolean("dragdrop_level_$level", true)
+                .apply()
+        }
     }
-
     private fun startTimer(level: Int) {
         countDownTimer = object : CountDownTimer(getTimeForLevel(level), 1000) {
             override fun onTick(millisUntilFinished: Long) {
@@ -239,12 +245,25 @@ class DragDropActivity : AppCompatActivity() {
 
     private fun showResultDialog(success: Boolean) {
         countDownTimer.cancel()
+
+        val accuracy = correctPlacements.toDouble() / totalElements
+        if (accuracy >= 0.7) {
+            saveDragDropCompleted(level = intent.getIntExtra("LEVEL", 1))
+        }
+
         AlertDialog.Builder(this)
             .setTitle(if (success) "Congratulations!" else "Time's Up!")
             .setMessage("Correct: $correctPlacements\nIncorrect: $incorrectPlacements")
             .setPositiveButton("OK") { _: DialogInterface, _: Int -> finish() }
             .setCancelable(false)
             .show()
+    }
+
+    private fun saveDragDropCompleted(level: Int) {
+        getSharedPreferences("ChemStartPrefs", MODE_PRIVATE)
+            .edit()
+            .putBoolean("dragdrop_level_$level", true)
+            .apply()
     }
 
     private fun getColorForElement(element: ElementDatabase.Element): Int {

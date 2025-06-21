@@ -8,6 +8,7 @@ import com.example.chemstart.databinding.ActivityMainBinding
 // MainActivity.kt
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
+    private val PREF_NAME = "ChemStartPrefs"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -18,25 +19,35 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupLevelButtons() {
-        // Level 1
-        binding.btnLevel1Drag.setOnClickListener { startDragDropActivity(1) }
-        binding.btnLevel1Quiz.setOnClickListener { startQuizActivity(1) }
+        val buttons = listOf(
+            Pair(binding.btnLevel1Drag, binding.btnLevel1Quiz),
+            Pair(binding.btnLevel2Drag, binding.btnLevel2Quiz),
+            Pair(binding.btnLevel3Drag, binding.btnLevel3Quiz),
+            Pair(binding.btnLevel4Drag, binding.btnLevel4Quiz),
+            Pair(binding.btnLevel5Drag, binding.btnLevel5Quiz)
+        )
 
-        // Level 2
-        binding.btnLevel2Drag.setOnClickListener { startDragDropActivity(2) }
-        binding.btnLevel2Quiz.setOnClickListener { startQuizActivity(2) }
+        for (i in buttons.indices) {
+            val level = i + 1
+            val (dragBtn, quizBtn) = buttons[i]
+            val unlocked = if (level == 1) true else isLevelCompleted(level - 1)
 
-        // Level 3
-        binding.btnLevel3Drag.setOnClickListener { startDragDropActivity(3) }
-        binding.btnLevel3Quiz.setOnClickListener { startQuizActivity(3) }
+            dragBtn.isEnabled = unlocked
+            quizBtn.isEnabled = unlocked
 
-        // Level 4
-        binding.btnLevel4Drag.setOnClickListener { startDragDropActivity(4) }
-        binding.btnLevel4Quiz.setOnClickListener { startQuizActivity(4) }
+            if (isLevelCompleted(level)) {
+                dragBtn.text = "✅ Drag & Drop"
+                quizBtn.text = "✅ Quiz"
+            }
 
-        // Level 5
-        binding.btnLevel5Drag.setOnClickListener { startDragDropActivity(5) }
-        binding.btnLevel5Quiz.setOnClickListener { startQuizActivity(5) }
+            dragBtn.setOnClickListener {
+                startDragDropActivity(level)
+            }
+
+            quizBtn.setOnClickListener {
+                startQuizActivity(level)
+            }
+        }
     }
 
     private fun startDragDropActivity(level: Int) {
@@ -51,5 +62,17 @@ class MainActivity : AppCompatActivity() {
             putExtra("LEVEL", level)
         }
         startActivity(intent)
+    }
+
+    private fun isLevelCompleted(level: Int): Boolean {
+        val prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE)
+        val dragPassed = prefs.getBoolean("dragdrop_level_$level", false)
+        val quizPassed = prefs.getBoolean("quiz_level_$level", false)
+        return dragPassed && quizPassed
+    }
+
+    override fun onResume() {
+        super.onResume()
+        setupLevelButtons() // Refresh buttons & progress when coming back
     }
 }

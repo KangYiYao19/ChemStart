@@ -333,16 +333,16 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- Progress Indicator -->
-        <TextView
-            android:id="@+id/tvProgress"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Progress: 0/5 levels completed"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="@color/dark_text"
-            android:layout_marginTop="16dp"
-            android:layout_gravity="center_horizontal" />
+<!--        &lt;!&ndash; Progress Indicator &ndash;&gt;-->
+<!--        <TextView-->
+<!--            android:id="@+id/tvProgress"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Progress: 0/5 levels completed"-->
+<!--            android:textSize="16sp"-->
+<!--            android:textStyle="bold"-->
+<!--            android:textColor="@color/dark_text"-->
+<!--            android:layout_marginTop="16dp"-->
+<!--            android:layout_gravity="center_horizontal" />-->
     </LinearLayout>
 </ScrollView>
