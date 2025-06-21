@@ -134,22 +134,20 @@ class DragDropActivity : AppCompatActivity() {
                     isEnabled = true
                     setTextColor(Color.DKGRAY)
                     setBackgroundColor(Color.WHITE)
-                    setBackgroundResource(R.drawable.cell_border)
+                    setBackgroundColor(getColorForElement(element))
                 } else {
                     text = element.symbol
                     isEnabled = false
                     tag = null
                     setTextColor(Color.BLACK)
                     setBackgroundColor(Color.LTGRAY)
-                    setBackgroundResource(R.drawable.cell_border)
+                    setBackgroundColor(getColorForElement(element))
                 }
             }
 
             grid.addView(cell)
         }
     }
-
-
 
     private fun setupGridDropTargets() {
         for (i in 0 until binding.periodicTableGrid.childCount) {
