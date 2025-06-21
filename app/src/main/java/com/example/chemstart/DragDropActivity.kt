@@ -6,27 +6,27 @@ import android.content.res.Resources
 import android.graphics.Color
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.view.ContextThemeWrapper
 import android.view.DragEvent
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.widget.GridLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.chemstart.data.ElementDatabase
 import com.example.chemstart.databinding.ActivityDragDropBinding
 
 class DragDropActivity : AppCompatActivity() {
     private lateinit var binding: ActivityDragDropBinding
     private lateinit var elements: List<ElementDatabase.Element>
-    private var score = 0
-    private lateinit var countDownTimer: CountDownTimer
     private var correctPlacements = 0
+    private var incorrectPlacements = 0
+    private lateinit var countDownTimer: CountDownTimer
     private var totalElements = 0
+    private var remainingElements = mutableListOf<ElementDatabase.Element>()
+    private var currentElement: ElementDatabase.Element? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,103 +46,121 @@ class DragDropActivity : AppCompatActivity() {
 
     @SuppressLint("SetTextI18n")
     private fun setupGame(level: Int) {
-        binding.tvTimer.text = "Time: ${when (level) {
-            1 -> 90
-            2 -> 75
-            3 -> 60
-            4 -> 45
-            5 -> 120
-            else -> 90
-        }}"
+        binding.tvTimer.text = "Time: ${getTimeForLevel(level) / 1000}"
         binding.tvTimer.setTextColor(ContextCompat.getColor(this, R.color.timer_default))
-        binding.tvScore.text = "Score: $score"
+        binding.tvCorrectScore.text = "0"
+        binding.tvIncorrectScore.text = "0"
 
-        // Setup grid
-        binding.gridPeriodicTable.layoutManager = GridLayoutManager(this, 18)
-        binding.gridPeriodicTable.adapter = PeriodicTableAdapter(level)
+        renderPeriodicTable(elements)
+        setupGridDropTargets()
 
-        // Create draggable tiles
-        createElementTiles(elements)
+        remainingElements = elements.shuffled().toMutableList()
+        createNextElementTile()
     }
 
-    private fun createElementTiles(elements: List<ElementDatabase.Element>) {
-        binding.elementTray.removeAllViews()
+    private fun createNextElementTile() {
+        binding.draggableElementContainer.removeAllViews()
 
-        elements.forEach { element ->
-            val tile = TextView(this).apply {
-                text = element.symbol
-                textSize = 16f
-                setTextColor(Color.WHITE)
-                setBackgroundColor(getColorForElement(element))
-                setPadding(8, 8, 8, 8)
-                tag = element
-
-                setOnLongClickListener { v ->
-                    val dragShadow = View.DragShadowBuilder(v)
-                    v.startDragAndDrop(null, dragShadow, v, 0)
-                    v.visibility = View.INVISIBLE
-                    true
-                }
-            }
-            binding.elementTray.addView(tile)
+        if (remainingElements.isEmpty()) {
+            checkAnswers()
+            return
         }
+
+        currentElement = remainingElements.removeFirst()
+        binding.tvDraggableSymbol.text = currentElement!!.symbol
+        binding.tvDraggableName.text = currentElement!!.name
+
+        val tile = TextView(this).apply {
+            text = currentElement!!.symbol
+            textSize = 24f
+            setTextColor(Color.WHITE)
+            setBackgroundColor(getColorForElement(currentElement!!))
+            gravity = Gravity.CENTER
+            setPadding(16, 16, 16, 16)
+            tag = currentElement
+
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+
+            setOnLongClickListener { v ->
+                val dragShadow = View.DragShadowBuilder(v)
+                v.startDragAndDrop(null, dragShadow, v, 0)
+                v.visibility = View.INVISIBLE
+                true
+            }
+        }
+
+        binding.draggableElementContainer.addView(tile)
     }
 
-    private fun setupDragAndDrop() {
-        binding.gridPeriodicTable.setOnDragListener { view, event ->
-            when (event.action) {
-                DragEvent.ACTION_DRAG_STARTED -> true
-                DragEvent.ACTION_DRAG_ENTERED -> {
-                    view.setBackgroundColor(ContextCompat.getColor(this, R.color.drag_target_highlight))
-                    true
-                }
-                DragEvent.ACTION_DRAG_EXITED -> {
-                    view.setBackgroundColor(Color.TRANSPARENT)
-                    true
-                }
-                DragEvent.ACTION_DROP -> {
-                    val draggedView = event.localState as TextView
-                    val element = draggedView.tag as ElementDatabase.Element
-                    val targetCell = view as TextView
+    private fun renderPeriodicTable(elements: List<ElementDatabase.Element>) {
+        val grid = binding.periodicTableGrid
+        grid.removeAllViews()
+        val elementMap = elements.associateBy { Pair(it.period, it.group) }
 
-                    if (isCorrectPlacement(element, targetCell)) {
-                        score += 10
-                        correctPlacements++
-                        binding.tvScore.text = "Score: $score"
-                        targetCell.text = element.symbol
-                        targetCell.setBackgroundColor(getColorForElement(element))
-                    } else {
-                        score = maxOf(0, score - 5)
-                        binding.tvScore.text = "Score: $score"
-                        draggedView.visibility = View.VISIBLE
+        for (period in 1..7) {
+            for (group in 1..18) {
+                val key = Pair(period, group)
+                val element = elementMap[key]
+
+                val cell = TextView(this).apply {
+                    text = ""
+                    tag = element
+                    gravity = Gravity.CENTER
+                    textSize = 14f
+                    setPadding(2, 2, 2, 2)
+                    setBackgroundResource(R.drawable.cell_border)
+
+                    layoutParams = GridLayout.LayoutParams(
+                        GridLayout.spec(period - 1), GridLayout.spec(group - 1)
+                    ).apply {
+                        width = dpToPx(40)
+                        height = dpToPx(40)
+                        setMargins(dpToPx(1), dpToPx(1), dpToPx(1), dpToPx(1))
                     }
-                    view.setBackgroundColor(Color.TRANSPARENT)
-                    true
                 }
-                DragEvent.ACTION_DRAG_ENDED -> {
-                    view.setBackgroundColor(Color.TRANSPARENT)
-                    val draggedView = event.localState as? TextView
-                    draggedView?.visibility = View.VISIBLE
-                    true
-                }
-                else -> false
+
+                grid.addView(cell)
             }
         }
     }
 
-    private fun isCorrectPlacement(element: ElementDatabase.Element, targetCell: TextView): Boolean {
-        // Implement your logic to check if element is placed in correct cell
-        // This would compare element's group/period with target cell's position
-        return true // Placeholder - implement your actual logic
-    }
+    private fun setupGridDropTargets() {
+        for (i in 0 until binding.periodicTableGrid.childCount) {
+            val cell = binding.periodicTableGrid.getChildAt(i) as TextView
+            cell.setOnDragListener { view, event ->
+                when (event.action) {
+                    DragEvent.ACTION_DROP -> {
+                        val draggedElement = currentElement ?: return@setOnDragListener true
+                        val targetCell = view as TextView
+                        val targetElement = targetCell.tag as? ElementDatabase.Element ?: return@setOnDragListener true
 
-    private fun getColorForElement(element: ElementDatabase.Element): Int {
-        return when (element.category) {
-            "metal" -> Color.parseColor("#FFA500") // Orange
-            "nonmetal" -> Color.parseColor("#ADD8E6") // Light Blue
-            "metalloid" -> Color.parseColor("#90EE90") // Light Green
-            "noble gas" -> Color.parseColor("#FFC0CB") // Pink
-            else -> Color.GRAY
+                        if (targetElement.group == draggedElement.group &&
+                            targetElement.period == draggedElement.period
+                        ) {
+                            targetCell.text = draggedElement.symbol
+                            targetCell.setBackgroundColor(getColorForElement(draggedElement))
+                            correctPlacements++
+                            binding.tvCorrectScore.text = correctPlacements.toString()
+                        } else {
+                            incorrectPlacements++
+                            binding.tvIncorrectScore.text = incorrectPlacements.toString()
+                        }
+
+                        createNextElementTile()
+                        true
+                    }
+
+                    DragEvent.ACTION_DRAG_ENDED -> {
+                        binding.draggableElementContainer.getChildAt(0)?.visibility = View.VISIBLE
+                        true
+                    }
+
+                    else -> true
+                }
+            }
         }
     }
 
@@ -159,110 +177,59 @@ class DragDropActivity : AppCompatActivity() {
     }
 
     private fun resetGame() {
-        score = 0
         correctPlacements = 0
-        binding.tvScore.text = "Score: $score"
+        incorrectPlacements = 0
         setupGame(intent.getIntExtra("LEVEL", 1))
     }
 
     private fun startTimer(level: Int) {
-        val timeLimitMillis = when (level) {
-            1 -> 90_000L  // Level 1: 90 seconds
-            2 -> 75_000L  // Level 2: 75 seconds
-            3 -> 60_000L  // Level 3: 60 seconds
-            4 -> 45_000L  // Level 4: 45 seconds
-            5 -> 120_000L // Level 5: 120 seconds
-            else -> 90_000L // Default
-        }
-
-        countDownTimer = object : CountDownTimer(timeLimitMillis, 1000) {
-            @SuppressLint("SetTextI18n")
+        countDownTimer = object : CountDownTimer(getTimeForLevel(level), 1000) {
             override fun onTick(millisUntilFinished: Long) {
-                // Update timer display every second
-                val secondsRemaining = millisUntilFinished / 1000
-                binding.tvTimer.text = "Time: $secondsRemaining"
-
-                // Change color when time is running low
-                if (secondsRemaining <= 10) {
+                val seconds = millisUntilFinished / 1000
+                binding.tvTimer.text = "Time: $seconds"
+                if (seconds <= 10) {
                     binding.tvTimer.setTextColor(ContextCompat.getColor(this@DragDropActivity, R.color.red))
                 }
             }
 
             override fun onFinish() {
-                // Time's up!
                 binding.tvTimer.text = "Time: 0"
-                binding.tvTimer.setTextColor(ContextCompat.getColor(this@DragDropActivity, R.color.red))
-
-                // Show results dialog
                 showResultDialog(false)
-
-                // Disable further interactions
-                disableGameInteraction()
             }
         }.start()
     }
 
-    // Helper function to disable game interaction
-    private fun disableGameInteraction() {
-        binding.elementTray.isEnabled = false
-        binding.gridPeriodicTable.isEnabled = false
-        binding.btnCheck.isEnabled = false
-        binding.btnReset.isEnabled = false
+    private fun getTimeForLevel(level: Int): Long {
+        return when (level) {
+            1 -> 90_000L
+            2 -> 75_000L
+            3 -> 60_000L
+            4 -> 45_000L
+            5 -> 120_000L
+            else -> 90_000L
+        }
     }
 
-    private fun showResultDialog(success: Boolean = false) {
+    private fun showResultDialog(success: Boolean) {
         countDownTimer.cancel()
-
         AlertDialog.Builder(this)
             .setTitle(if (success) "Congratulations!" else "Time's Up!")
-            .setMessage("Your final score: $score")
-            .setPositiveButton("OK") { _: DialogInterface, _: Int ->
-                finish()
-            }
+            .setMessage("Correct: $correctPlacements\nIncorrect: $incorrectPlacements")
+            .setPositiveButton("OK") { _: DialogInterface, _: Int -> finish() }
             .setCancelable(false)
             .show()
     }
 
-    private fun getLevelTitle(level: Int): String {
-        return when (level) {
-            1 -> getString(R.string.level_1_title) // "First 20 Elements"
-            2 -> getString(R.string.level_2_title) // "Alkali Metals"
-            3 -> getString(R.string.level_3_title) // "Transition Metals"
-            4 -> getString(R.string.level_4_title) // "Halogens"
-            5 -> getString(R.string.level_5_title) // "Full Periodic Table"
-            else -> getString(R.string.unknown_level) // "Unknown Level"
-        }
-    }
-}
-
-// Simple adapter for the grid
-class PeriodicTableAdapter(private val level: Int) : RecyclerView.Adapter<PeriodicTableAdapter.ViewHolder>() {
-
-    class ViewHolder(val textView: TextView) : RecyclerView.ViewHolder(textView) {
-        fun bind(position: Int) {
-            // Custom cell content can be added here
+    private fun getColorForElement(element: ElementDatabase.Element): Int {
+        return when (element.category.lowercase()) {
+            "metal" -> Color.parseColor("#FFA500")
+            "nonmetal" -> Color.parseColor("#ADD8E6")
+            "metalloid" -> Color.parseColor("#90EE90")
+            "noble gas" -> Color.parseColor("#FFC0CB")
+            else -> Color.GRAY
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val textView = TextView(
-            ContextThemeWrapper(parent.context, R.style.PeriodicTableCell),
-            null,
-            0
-        )
-        return ViewHolder(textView)
-    }
-
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(position)
-    }
-
-    override fun getItemCount(): Int = when (level) {
-        1 -> 20
-        2 -> 6
-        3 -> 4
-        4 -> 6
-        5 -> 118
-        else -> 20
-    }
+    private fun dpToPx(dp: Int): Int =
+        (dp * Resources.getSystem().displayMetrics.density).toInt()
 }
